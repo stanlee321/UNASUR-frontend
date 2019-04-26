@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'dart:async';
 
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
-const URL = "http://www.bancounion.com.bo/";
+String url = "http://localhost:3003";
 
 
 void main() => runApp(MyApp());
@@ -14,7 +13,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Welcome to Flutter',
       theme: ThemeData.dark(),
-      home: Home(),
+      routes: {
+        "/": (_) => Home(),
+        "/webview": (_) => WebviewScaffold(
+              url: url,                                                                                                                                                                                                         
+              appBar: AppBar(
+                title: Text("WebView"),
+              ),
+              withJavascript: true,
+              withLocalStorage: true,
+              withZoom: false,
+            )
+      },
     );
   }
 }
@@ -25,33 +35,50 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends  State<Home>{
-  Future launchURL(String url) async {
-    if (await canLaunch(url)){
-      await launch(url,  forceSafariVC:true, forceWebView:true);
-    }
+
+  final webView  = FlutterWebviewPlugin();
+  TextEditingController controller = TextEditingController(text: url);
+
+  @override
+  void initState(){
+    super.initState();
+
+    webView.close();
+    controller.addListener(() {
+      url= controller.text;
+    });
+  }
+
+  @override
+  void dispose() {
+    webView.dispose();
+    controller.dispose();
+    super.dispose();
   }
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
         appBar: AppBar(
-          title: Text('WebView'),
+          title: Text("WebView"),
         ),
         body: Center(
           child: Column(
             children: <Widget>[
               Container(
                 padding: EdgeInsets.all(10.0),
-                child:Text(URL)
+                child: TextField(
+                  controller: controller,
+                ),
               ),
               RaisedButton(
-                child: Text("Open Link"),
-                onPressed: (){},
+                child: Text("Open Webview"),
+                onPressed: () {
+                  Navigator.of(context).pushNamed("/webview");
+                },
               )
             ],
           ),
-        ),
+        )
       );
   }
-  
 }
