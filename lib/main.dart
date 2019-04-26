@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 String url = "http://localhost:3003";
 
 
-void main() => runApp(MyApp());
+// void main() => runApp(MyApp());
+
+void main() {
+  SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft])
+    .then((_) {
+      runApp(new MyApp());
+    });
+}
 
 class MyApp extends StatelessWidget {
   @override
