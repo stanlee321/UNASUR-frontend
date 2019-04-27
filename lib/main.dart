@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
-String url = "http://localhost:3003";
+import 'header_appbar.dart';
+
+String url = "http://192.168.8.6:3003";
+//String url = "http://www.youtube.com";
 
 
 // void main() => runApp(MyApp());
+
 
 void main() {
   SystemChrome.setPreferredOrientations([
@@ -16,18 +20,29 @@ void main() {
     });
 }
 
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Welcome to Flutter',
-      theme: ThemeData.dark(),
+      title: 'Welcome to UNASUR',
+      //theme: ThemeData(brightness: Brightness.dark),
+      theme: ThemeData(
+              primarySwatch: Colors.indigo),
       routes: {
         "/": (_) => Home(),
         "/webview": (_) => WebviewScaffold(
               url: url,                                                                                                                                                                                                         
               appBar: AppBar(
-                title: Text("WebView"),
+                title: Text(
+                    "Domótica UNASUR",
+                    style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25.0,
+                    fontFamily: 'Lato',
+                    fontWeight: FontWeight.bold
+                  )
+                ),
               ),
               withJavascript: true,
               withLocalStorage: true,
@@ -56,6 +71,7 @@ class HomeState extends  State<Home>{
     controller.addListener(() {
       url= controller.text;
     });
+
   }
 
   @override
@@ -64,30 +80,63 @@ class HomeState extends  State<Home>{
     controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("WebView"),
-        ),
-        body: Center(
-          child: Column(
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(10.0),
-                child: TextField(
-                  controller: controller,
-                ),
-              ),
-              RaisedButton(
-                child: Text("Open Webview"),
-                onPressed: () {
-                  Navigator.of(context).pushNamed("/webview");
-                },
-              )
-            ],
+          title: Text(
+            "UNASUR",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 25.0,
+              fontFamily: 'Lato',
+              fontWeight: FontWeight.bold
+            ),
+            textAlign: TextAlign.center,
           ),
-        )
+          
+        ),
+        body: Stack(
+          children: <Widget>[
+            HeaderAppBar(),
+            Center(
+              child: 
+              ButtonTheme(
+                minWidth: 200.0,
+                height: 70.0,
+                buttonColor: Colors.orange,
+                child: RaisedButton(
+                  child: Text(
+                    "Abrir panel Domótico",
+                    style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                    fontFamily: 'Lato',
+                    fontWeight: FontWeight.bold
+                    )
+                  ),
+
+                  onPressed: () {
+                      Navigator.of(context).pushNamed("/webview");
+                  },
+                  shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0))
+                )
+              )
+            ),
+          ],
+        ),
+      bottomNavigationBar: BottomAppBar(
+        child: Text(
+          "Developed by www.deepmicrosystems.com",
+          style: TextStyle(
+          color: Colors.white,
+          fontSize: 14.5,
+          fontFamily: 'Lato',
+          //fontWeight: FontWeight.bold
+          )
+        ),
+        color: Colors.indigo),
       );
   }
 }
