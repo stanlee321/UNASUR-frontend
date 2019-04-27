@@ -1,21 +1,25 @@
-# unasur_front
+# UNASUR APK
 
-A new Flutter project.
+This implements the android client for UNASUR, it uses Flutter WebView  for display the native WebApp running in the server.
+
+This app require https://github.com/stanlee321/knx-server-nodejs backend.
+
+<div style="text-align:center"><img src ="https://github.com/stanlee321/UNASUR-frontend/images/1.png" /></div>
+
+<div style="text-align:center"><img src ="https://github.com/stanlee321/UNASUR-frontend/images/2.png" /></div>
+
+<div style="text-align:center"><img src ="https://github.com/stanlee321/UNASUR-frontend/images/3.png" /></div>
+
+<div style="text-align:center"><img src ="https://github.com/stanlee321/UNASUR-frontend/images/4.png" /></div>
+
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+```bash
 
-A few resources to get you started if this is your first Flutter project:
+# For run the app in your Phone in debug mode
+$ flutter run
 
-- [Lab: Write your first Flutter app](https://flutter.io/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.io/docs/cookbook)
-
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.io/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
-
-
-# Links
-
-https://pub.dartlang.org/packages/flutter_launcher_icons
+# For build APK
+$ flutter build apk
+```
