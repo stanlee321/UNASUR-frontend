@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'header_appbar.dart';
+//import 'package:http/http.dart' as http;
 
 String url = "http://192.168.8.6:3003";
 //String url = "http://www.youtube.com";
@@ -47,7 +50,14 @@ class MyApp extends StatelessWidget {
               withJavascript: true,
               withLocalStorage: true,
               withZoom: false,
-            )
+              withLocalUrl: true,
+              hidden: true,
+              initialChild: Container(
+                child: const Center(
+                  child: CircularProgressIndicator()
+                )
+              )
+            ),
       },
     );
   }
@@ -60,22 +70,112 @@ class Home extends StatefulWidget {
 
 class HomeState extends  State<Home>{
 
-  final webView  = FlutterWebviewPlugin();
+  final webView  = new FlutterWebviewPlugin();
   TextEditingController controller = TextEditingController(text: url);
+  
+  // On destroy stream
+  StreamSubscription _onDestroy;
+  
+  // On urlChanged stream
+  StreamSubscription<String> _onUrlChanged;
 
+  // On urlChanged stream
+  StreamSubscription<WebViewStateChanged> _onStateChanged;
+
+  StreamSubscription<WebViewHttpError> _onHttpError;
+
+  StreamSubscription<double> _onProgressChanged;
+  
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _history = [];
+
+  // get website title
+  /*
+  Future<String> getWebTitle({String url}) async{
+    final res = await http.get(url);
+    String title = RegExp(r"<[t|T]{1}[i|I]{1}[t|T]{1}[l|L]{1}[e|E]{1}(\s.*)?>([^<]*)</[t|T]{1}[i|I]{1}[t|T]{1}[l|L]{1}[e|E]{1}>").stringMatch(res.data);
+    if(title!=null){
+      return title.substring(title.indexOf('>')+1, title.lastIndexOf("<"));
+    }else{
+      return "";
+    }
+  }
+  */
   @override
   void initState(){
     super.initState();
-
     webView.close();
+    webView.onHttpError.skip(1000);
+
+    webView.onStateChanged.listen(( WebViewStateChanged state) async {
+      print('state');
+      print(state);
+      if (state.type == WebViewState.finishLoad) {
+        String script = 'window.document.title';
+        var title = await webView.evalJavascript(script);
+        if (title.contains('Web')) {
+          webView.dispose();
+          webView.close();
+        }
+      }
+    });
+
+    webView.onHttpError.listen(( WebViewHttpError error) async {
+      print('error');
+      print(error);
+    });
+
+
+    // Add a listener to on destroy WebView, so you can make came actions.
+    _onDestroy = webView.onDestroy.listen((_) {
+      if (mounted) {
+        // Actions like show a info toast.
+        _scaffoldKey.currentState.showSnackBar(const SnackBar(content: const Text('Webview Destroyed')));
+      }
+    });
+
+    // Add a listener to on url changed
+    _onUrlChanged = webView.onUrlChanged.listen((String url) {
+      if (mounted) {
+        setState(() {
+          _history.add('onUrlChanged: $url');
+        });
+      }
+    });
+
+
+    _onStateChanged = webView.onStateChanged.listen((WebViewStateChanged state) {
+      if (mounted) {
+        setState(() {
+          _history.add('onStateChanged: ${state.type} ${state.url}');
+          print('States___ ${state}');
+        });
+      }
+    });
+
+    _onHttpError = webView.onHttpError.listen((WebViewHttpError error) {
+      print('error is ${error} error');
+      if (mounted) {
+        setState(() {
+          _history.add('onHttpError: ${error.code} ${error.url}');
+          print('Error ${error}');
+        });
+      }
+    });
+
     controller.addListener(() {
       url= controller.text;
     });
-
   }
 
   @override
   void dispose() {
+    _onDestroy.cancel();
+    _onUrlChanged.cancel();
+    _onStateChanged.cancel();
+    _onHttpError.cancel();
+    _onProgressChanged.cancel();
+
     webView.dispose();
     controller.dispose();
     super.dispose();
@@ -83,6 +183,7 @@ class HomeState extends  State<Home>{
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -117,8 +218,8 @@ class HomeState extends  State<Home>{
                     )
                   ),
 
-                  onPressed: () {
-                      Navigator.of(context).pushNamed("/webview");
+                  onPressed: ()  {                    
+                    Navigator.of(context).pushNamed("/webview");
                   },
                   shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(30.0))
                 )
@@ -140,3 +241,4 @@ class HomeState extends  State<Home>{
       );
   }
 }
+
