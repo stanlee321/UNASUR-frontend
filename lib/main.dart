@@ -50,16 +50,16 @@ class MyApp extends StatelessWidget {
                       children: [
                         Text('Cargando...',
                             style: TextStyle(
-                            fontSize: 25.0,
+                            fontSize: 28.0,
                             fontFamily: 'Lato',
                             fontWeight: FontWeight.bold)
                         ),
                         SizedBox(height: 40),
                         CircularProgressIndicator(strokeWidth: 8.0,),
                         SizedBox(height: 90),
-                        Text('NOTA: Si tarda demasiado, Verificar Servidor!',
+                        Text('NOTA: Si tarda demasiado, ¡Verificar Servidor!',
                             style: TextStyle(
-                            fontSize: 12.0,
+                            fontSize: 18.0,
                             fontFamily: 'Lato'  )
                         )
                       ],
@@ -89,15 +89,15 @@ class HomeState extends State<Home> {
     //webView.onHttpError.skip(1000);
 
     webView.onStateChanged.listen((WebViewStateChanged state) async {
-      print('state');
-      print(state);
+      print('state::: ${ state}');
       if (state.type == WebViewState.finishLoad) {
         String script = 'window.document.title';
         var title = await webView.evalJavascript(script);
-        print(title);
-        if (title.contains('web no disponible')) {
+        //print('Title namen : ${title}');
+        if (title.contains('web no disponible') || title.contains("Webpage not available")) {
           webView.dispose();
           webView.close();
+          //print('Disposing...');
         }
       }
     });
