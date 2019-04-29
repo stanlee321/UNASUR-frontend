@@ -1,16 +1,12 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'header_appbar.dart';
-//import 'package:http/http.dart' as http;
 
-String url = "http://192.168.8.6:3003";
+String url = "http://192.168.8.217:3003";
+//String url = "http://10.0.0.6:3003";
 //String url = "http://www.youtube.com";
-
-// void main() => runApp(MyApp());
 
 void main() {
   SystemChrome.setPreferredOrientations(
@@ -52,14 +48,20 @@ class MyApp extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Si tarda demaciado, Verificar Servidor.',
+                        Text('Cargando...',
                             style: TextStyle(
-                            fontSize: 15.0,
+                            fontSize: 25.0,
                             fontFamily: 'Lato',
                             fontWeight: FontWeight.bold)
                         ),
                         SizedBox(height: 40),
-                        CircularProgressIndicator(strokeWidth: 8.0,)
+                        CircularProgressIndicator(strokeWidth: 8.0,),
+                        SizedBox(height: 90),
+                        Text('NOTA: Si tarda demasiado, Verificar Servidor!',
+                            style: TextStyle(
+                            fontSize: 12.0,
+                            fontFamily: 'Lato'  )
+                        )
                       ],
                     ),
                   ),
@@ -80,27 +82,11 @@ class HomeState extends State<Home> {
   final webView = new FlutterWebviewPlugin();
   TextEditingController controller = TextEditingController(text: url);
 
-  // On destroy stream
-  StreamSubscription _onDestroy;
-
-  // On urlChanged stream
-  StreamSubscription<String> _onUrlChanged;
-
-  // On urlChanged stream
-  StreamSubscription<WebViewStateChanged> _onStateChanged;
-
-  StreamSubscription<WebViewHttpError> _onHttpError;
-
-  StreamSubscription<double> _onProgressChanged;
-
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-  final _history = [];
-
   @override
   void initState() {
     super.initState();
     webView.close();
-    webView.onHttpError.skip(1000);
+    //webView.onHttpError.skip(1000);
 
     webView.onStateChanged.listen((WebViewStateChanged state) async {
       print('state');
@@ -109,49 +95,10 @@ class HomeState extends State<Home> {
         String script = 'window.document.title';
         var title = await webView.evalJavascript(script);
         print(title);
-        if (title.contains('Web')) {
+        if (title.contains('web no disponible')) {
           webView.dispose();
           webView.close();
         }
-      }
-    });
-
-
-    // Add a listener to on destroy WebView, so you can make came actions.
-    _onDestroy = webView.onDestroy.listen((_) {
-      if (mounted) {
-        // Actions like show a info toast.
-        _scaffoldKey.currentState.showSnackBar(
-            const SnackBar(content: const Text('Webview Destroyed')));
-      }
-    });
-
-    // Add a listener to on url changed
-    _onUrlChanged = webView.onUrlChanged.listen((String url) {
-      if (mounted) {
-        setState(() {
-          _history.add('onUrlChanged: $url');
-        });
-      }
-    });
-
-    _onStateChanged =
-        webView.onStateChanged.listen((WebViewStateChanged state) {
-      if (mounted) {
-        setState(() {
-          _history.add('onStateChanged: ${state.type} ${state.url}');
-          print('States___ ${state}');
-        });
-      }
-    });
-
-    _onHttpError = webView.onHttpError.listen((WebViewHttpError error) {
-      print('error is ${error} error');
-      if (mounted) {
-        setState(() {
-          _history.add('onHttpError: ${error.code} ${error.url}');
-          print('Error ${error}');
-        });
       }
     });
 
@@ -162,11 +109,6 @@ class HomeState extends State<Home> {
 
   @override
   void dispose() {
-    _onDestroy.cancel();
-    _onUrlChanged.cancel();
-    _onStateChanged.cancel();
-    _onHttpError.cancel();
-    _onProgressChanged.cancel();
     webView.dispose();
     controller.dispose();
     super.dispose();
