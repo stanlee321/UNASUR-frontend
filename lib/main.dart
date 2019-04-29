@@ -8,6 +8,10 @@ String url = "http://192.168.8.217:3003";
 //String url = "http://10.0.0.6:3003";
 //String url = "http://www.youtube.com";
 
+String message = 
+"NOTA: Asegúrese que está conectado a la red UNASUR \n\n"
+"y que el servidor domotico está corriendo.";
+
 void main() {
   SystemChrome.setPreferredOrientations(
           [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft])
@@ -50,14 +54,14 @@ class MyApp extends StatelessWidget {
                       children: [
                         Text('Cargando...',
                             style: TextStyle(
-                            fontSize: 28.0,
+                            fontSize: 32.0,
                             fontFamily: 'Lato',
                             fontWeight: FontWeight.bold)
                         ),
                         SizedBox(height: 40),
                         CircularProgressIndicator(strokeWidth: 8.0,),
                         SizedBox(height: 90),
-                        Text('NOTA: Si tarda demasiado, ¡Verificar Servidor!',
+                        Text(message,
                             style: TextStyle(
                             fontSize: 18.0,
                             fontFamily: 'Lato'  )
